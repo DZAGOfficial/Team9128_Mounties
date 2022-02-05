@@ -45,11 +45,151 @@ import java.util.concurrent.TimeUnit;
  * Useful Link for Servos:  https://stemrobotics.cs.pdx.edu/node/4742
  * OpMode Class definition: http://ftckey.com/apis/ftc/com/qualcomm/robotcore/eventloop/opmode/OpMode.html
  */
+@TeleOp
 
 public class Artemis_Control extends LinearOpMode {
 
-    @Override
-    public void runOpMode() throws InterruptedException {
+    DcMotor leftRear = null;
+    DcMotor rightRear = null;
+
+    // declare motor speed variables
+    double RR;                         // motor speed right rear
+    double LR;                         // motor speed left rear
+    double Event_Wheel_Right_X;        // joystick position right x
+    double Event_Wheel_Right_Y;        // joystick position right y
+    double Event_Wheel_Left_X;         // joystick position left x
+    double Event_Wheel_Left_Y;         // joystick position left y
+    double joyScale = 2.0;             // joyscale constrant / USED TO SHOW HOW MUCH POWER IS GIVEN THROUGH AN INPUT
+    double motorMax = 4.0;             // Limit motor power to this value for Andymark RUN_USING_ENCODER mode
+    /* Declare OpMode members. */
+    private final ElapsedTime runtime = new ElapsedTime();
+    private Blinker the_Hub;
+    private Gyroscope imu;
+
+    public void SetWheelDirection() {
+        leftRear.setDirection(DcMotor.Direction.FORWARD);
+        rightRear.setDirection(DcMotor.Direction.FORWARD);
+    }
+
+    public void UseEncoder() {
+        // Set the drive motor run modes:
+        // "RUN_USING_ENCODER" causes the motor to try to run at the specified fraction of full velocity
+        // Note: We were not able to make this run mode work until we switched Channel A and B encoder wiring into
+        // the motor controllers. (Neverest Channel A connects to MR Channel B input, and vice versa.)
+
+        leftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    // Call the sleep timer to cause the program to wait for a certain number of seconds.
+
+    public void GoToSleep(int SleepTime) {
+        try {
+            TimeUnit.SECONDS.sleep(SleepTime);
+        } catch (InterruptedException e) {
+            telemetry.addData("Status", "Sleep Failed.");
+            telemetry.update();
+        }
 
     }
+
+// Set the drive motor run modes:
+// "RUN_USING_ENCODER" causes the motor to try to run at the specified fraction of full velocity
+// Note: We were not able to make this run mode work until we switched Channel A and B encoder wiring into
+// the motor controllers. (Neverest Channel A connects to MR Channel B input, and vice versa.)
+
+// Set each of the 4 wheel powers to individual values
+
+    public void SetWheelPower(double LeftRear, double RightRear) {
+        leftRear.setPower(LeftRear);
+        rightRear.setPower(RightRear);
+    }
+
+// Set each of the 4 wheel powers to zero so they stop
+
+    public void StopWheels() {
+        leftRear.setPower(0.0);
+        rightRear.setPower(0.0);
+    }
+
+
+    @Override
+    public void runOpMode() { //RunOpMode Start
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
+
+        /* Initialize the hardware variables. Note that the strings used here as parameters
+         * to 'get' must correspond to the names assigned during the robot configuration
+         * step (using the FTC Robot Controller app on the phone).
+         */
+        leftRear = hardwareMap.dcMotor.get("leftRear");
+        rightRear = hardwareMap.dcMotor.get("rightRear");
+        the_Hub = hardwareMap.get(Blinker.class, "The Hub");
+        imu = hardwareMap.get(Gyroscope.class, "imu");
+
+        // Drive Motor direction:
+        leftRear.setDirection(DcMotor.Direction.REVERSE);
+        rightRear.setDirection(DcMotor.Direction.FORWARD);
+
+        // Set the drive motor run modes:
+        // "RUN_USING_ENCODER" causes the motor to try to run at the specified fraction of full velocity
+        // Note: We were not able to make this run mode work until we switched Channel A and B encoder wiring into
+        // the motor controllers. (Neverest Channel A connects to MR Channel B input, and vice versa.)
+        leftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        // Wait for the game to start (driver presses PLAY)
+        waitForStart();
+        runtime.reset();
+
+        // run until the end of the match (driver presses STOP)
+        while (opModeIsActive()) { // OpModeIsActive Start
+
+            // Code Common to both controllers
+
+            telemetry.addData("Status", "Run Time: " + runtime.toString());
+            telemetry.update();
+
+            // *************************************************************************
+            // GamePad 1 is the wheel gamepad
+            // *************************************************************************
+
+            // Reset speed variables
+            LR = 0;
+            RR = 0;
+
+            // The following variables represent diffent events on the controller.
+            // If you want to change use different buttons, see the following documentation.
+            // http://ftckey.com/apis/ftc/index.html?com/qualcomm/robotcore/hardware/Gamepad.html
+
+            // Get joystick values
+            Event_Wheel_Left_Y = -gamepad1.right_stick_y * joyScale; // invert so up is positive
+            Event_Wheel_Left_X = gamepad1.right_stick_x * joyScale;
+            Event_Wheel_Right_Y = -gamepad1.left_stick_y * joyScale; // Event_Wheel_Left_Y is not used at present
+            Event_Wheel_Right_X = gamepad1.left_stick_x * joyScale;
+
+            // Forward/back movement
+            LR += Event_Wheel_Right_Y;
+            RR += Event_Wheel_Right_Y;
+
+            // Side to side movement
+            LR -= Event_Wheel_Right_X;
+            RR += Event_Wheel_Right_X;
+
+            // Rotation movement
+            // LF += Event_Wheel_Left_X; RF -= Event_Wheel_Left_X; LR += Event_Wheel_Left_X; RR -= Event_Wheel_Left_X;
+            LR -= Event_Wheel_Left_X;
+            RR += Event_Wheel_Left_X;
+
+            // Clip motor power values to +-motorMax:
+            LR = Math.max(-motorMax, Math.min(LR, motorMax));
+            RR = Math.max(-motorMax, Math.min(RR, motorMax));
+
+            // Send values to the motors:
+            leftRear.setPower(LR);
+            rightRear.setPower(RR);
+
+        } // OpModeIsActive End
+    } // RunOpMode End
+// Wheels End
 }
