@@ -19,18 +19,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 package org.firstinspires.ftc.RobotArtemis;
 // Code based on http://team9960.org/mecanum-drive-prototype-1-manual-drive-software/
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import java.util.concurrent.TimeUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.Event;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+
+import java.util.concurrent.TimeUnit;
 
 // This program provides 2 gamepad control for the robot
 // GAMEPAD1 Controls the wheels
@@ -48,13 +44,11 @@ import com.qualcomm.robotcore.util.Range;
 
 // Opmode is manual
 
-@TeleOp(name="Manual2021", group="Linear Opmode")
+@TeleOp(name = "Manual2021", group = "Linear Opmode")
 // @Disabled
 
 public class Wheels2021 extends LinearOpMode { // Wheels Start
 
-    /* Declare OpMode members. */
-    private ElapsedTime runtime = new ElapsedTime();
     DcMotor leftFront = null;
     DcMotor rightFront = null;
     DcMotor leftRear = null;
@@ -63,7 +57,6 @@ public class Wheels2021 extends LinearOpMode { // Wheels Start
     DcMotor FlyWheel;
     DcMotor IntakeMotor;
     DcMotor BeltMotor;
-
     // declare motor speed variables
     double RF;                         // motor speed right front
     double LF;                         // motor speed left front
@@ -76,37 +69,33 @@ public class Wheels2021 extends LinearOpMode { // Wheels Start
     double joyScale = 2.0;             // joyscale constrant / USED TO SHOW HOW MUCH POWER IS GIVEN THROUGH AN INPUT
     double motorMax = 4.0;             // Limit motor power to this value for Andymark RUN_USING_ENCODER mode
     double SERVO_JUMP = 0.1;           // positional increment for servo movement
-
-    double  clawPosition;              // current position of Claw
-    double  elevatorPosition;          // current position of Elevator
-    int  boomPosition;              // current position of Boom
-
+    double clawPosition;              // current position of Claw
+    double elevatorPosition;          // current position of Elevator
+    int boomPosition;              // current position of Boom
     // Smart Servo Settings
     double LEVERUP = -.25;
     double LEVERDOWN = .25;
     double LEVEROFF = .5;
-
     //   Constants
-    double  MAX_CLAW_POSITION = .75;
-    double  MIN_CLAW_POSITION = .25;
-    double  MAX_ELEVATOR_POSITION = 1;
-    double  MIN_ELEVATOR_POSITION = .65;
-    int  MAX_BOOM_POSITION = 1000;
-    int  MIN_BOOM_POSITION = 0;
-    int     BOOM_FORWARD_JUMP = 500;       // positional increment going forward
-    int     BOOM_REVERSE_JUMP = 500;      // positional increment going in reverse
+    double MAX_CLAW_POSITION = .75;
+    double MIN_CLAW_POSITION = .25;
+    double MAX_ELEVATOR_POSITION = 1;
+    double MIN_ELEVATOR_POSITION = .65;
+    int MAX_BOOM_POSITION = 1000;
+    int MIN_BOOM_POSITION = 0;
+    int BOOM_FORWARD_JUMP = 500;       // positional increment going forward
+    int BOOM_REVERSE_JUMP = 500;      // positional increment going in reverse
+    /* Declare OpMode members. */
+    private final ElapsedTime runtime = new ElapsedTime();
 
-
-    public void SetWheelDirection()
-    {
+    public void SetWheelDirection() {
         leftFront.setDirection(DcMotor.Direction.FORWARD);
         rightFront.setDirection(DcMotor.Direction.FORWARD);
         leftRear.setDirection(DcMotor.Direction.FORWARD);
         rightRear.setDirection(DcMotor.Direction.FORWARD);
     }
 
-    public void UseEncoder()
-    {
+    public void UseEncoder() {
         // Set the drive motor run modes:
         // "RUN_USING_ENCODER" causes the motor to try to run at the specified fraction of full velocity
         // Note: We were not able to make this run mode work until we switched Channel A and B encoder wiring into
@@ -120,11 +109,10 @@ public class Wheels2021 extends LinearOpMode { // Wheels Start
 
     // Call the sleep timer to cause the program to wait for a certain number of seconds.
 
-    public void GoToSleep( int SleepTime)
-    {
-        try
-        { TimeUnit.SECONDS.sleep(SleepTime);}
-        catch(InterruptedException e) {
+    public void GoToSleep(int SleepTime) {
+        try {
+            TimeUnit.SECONDS.sleep(SleepTime);
+        } catch (InterruptedException e) {
             telemetry.addData("Status", "Sleep Failed.");
             telemetry.update();
         }
@@ -138,8 +126,7 @@ public class Wheels2021 extends LinearOpMode { // Wheels Start
 
 // Set each of the 4 wheel powers to individual values
 
-    public void SetWheelPower( double LeftFront, double RightFront, double LeftRear, double RightRear)
-    {
+    public void SetWheelPower(double LeftFront, double RightFront, double LeftRear, double RightRear) {
         leftFront.setPower(LeftFront);
         rightFront.setPower(RightFront);
         leftRear.setPower(LeftRear);
@@ -148,78 +135,65 @@ public class Wheels2021 extends LinearOpMode { // Wheels Start
 
 // Set each of the 4 wheel powers to zero so they stop
 
-    public void StopWheels()
-    {
+    public void StopWheels() {
         leftFront.setPower(0.0);
         rightFront.setPower(0.0);
         leftRear.setPower(0.0);
         rightRear.setPower(0.0);
     }
 
-    public void SetFlyWheelDirection()
-    {
+    public void SetFlyWheelDirection() {
         FlyWheel.setDirection(DcMotor.Direction.FORWARD);
     }
 
-    public void StopFlyWheel()
-    {
+    public void StopFlyWheel() {
         FlyWheel.setPower(0.0);
     }
 
 // Sets the direction of the wheels to move the bot left
 
-    public void RunFlyWheel()
-    {
+    public void RunFlyWheel() {
         FlyWheel.setPower(0.75);
     }
 
 
-    public void SetIntakeMotorDirection()
-    {
+    public void SetIntakeMotorDirection() {
         IntakeMotor.setDirection(DcMotor.Direction.REVERSE);
     }
 
-    public void StopIntakeMotor()
-    {
+    public void StopIntakeMotor() {
         IntakeMotor.setPower(0.0);
     }
 
 // Sets the direction of the wheels to move the bot left
 
-    public void RunIntakeMotor()
-    {
+    public void RunIntakeMotor() {
         IntakeMotor.setPower(0.5);
     }
 
 // Sets the direction of the wheels to move the bot left
 
-    public void RunBeltMotor()
-    {
+    public void RunBeltMotor() {
         BeltMotor.setPower(0.5);
     }
 
-    public void SetBeltMotorDirection()
-    {
+    public void SetBeltMotorDirection() {
         BeltMotor.setDirection(DcMotor.Direction.FORWARD);
     }
 
-    public void StopBeltMotor()
-    {
+    public void StopBeltMotor() {
         BeltMotor.setPower(0.0);
     }
 
 
-
-    public void RunFlyWheelBySeconds(double secs)
-    {
+    public void RunFlyWheelBySeconds(double secs) {
 
         runtime.reset();
         SetFlyWheelDirection();
-        telemetry.addData("Moving forward seconds:.", "%.2f",secs);
+        telemetry.addData("Moving forward seconds:.", "%.2f", secs);
         telemetry.update();
 
-        while (runtime.seconds() <= secs)
-        {
+        while (runtime.seconds() <= secs) {
             RunFlyWheel();
         }
 
@@ -285,7 +259,10 @@ public class Wheels2021 extends LinearOpMode { // Wheels Start
             // *************************************************************************
 
             // Reset speed variables
-            LF = 0; RF = 0; LR = 0; RR = 0;
+            LF = 0;
+            RF = 0;
+            LR = 0;
+            RR = 0;
 
             // The following variables represent diffent events on the controller.
             // If you want to change use different buttons, see the following documentation.
@@ -298,14 +275,23 @@ public class Wheels2021 extends LinearOpMode { // Wheels Start
             Event_Wheel_Right_X = gamepad1.left_stick_x * joyScale;
 
             // Forward/back movement
-            LF += Event_Wheel_Right_Y; RF += Event_Wheel_Right_Y; LR += Event_Wheel_Right_Y; RR += Event_Wheel_Right_Y;
+            LF += Event_Wheel_Right_Y;
+            RF += Event_Wheel_Right_Y;
+            LR += Event_Wheel_Right_Y;
+            RR += Event_Wheel_Right_Y;
 
             // Side to side movement
-            LF += Event_Wheel_Right_X; RF -= Event_Wheel_Right_X; LR -= Event_Wheel_Right_X; RR += Event_Wheel_Right_X;
+            LF += Event_Wheel_Right_X;
+            RF -= Event_Wheel_Right_X;
+            LR -= Event_Wheel_Right_X;
+            RR += Event_Wheel_Right_X;
 
             // Rotation movement
             // LF += Event_Wheel_Left_X; RF -= Event_Wheel_Left_X; LR += Event_Wheel_Left_X; RR -= Event_Wheel_Left_X;
-            LF -= Event_Wheel_Left_X; RF += Event_Wheel_Left_X; LR -= Event_Wheel_Left_X; RR += Event_Wheel_Left_X;
+            LF -= Event_Wheel_Left_X;
+            RF += Event_Wheel_Left_X;
+            LR -= Event_Wheel_Left_X;
+            RR += Event_Wheel_Left_X;
 
             // Clip motor power values to +-motorMax
             LF = Math.max(-motorMax, Math.min(LF, motorMax));
@@ -324,41 +310,32 @@ public class Wheels2021 extends LinearOpMode { // Wheels Start
             // *************************************************************************
 
 
-
             // Based on an event on the controller, increment or decrement elevator position and execute command to set it.
-            if (gamepad2.x)
-            {
+            if (gamepad2.x) {
                 SetIntakeMotorDirection();
                 RunIntakeMotor();
                 SetBeltMotorDirection();
                 RunBeltMotor();
-            }
-            else
-            {
+            } else {
                 StopIntakeMotor();
                 StopBeltMotor();
             }
 
             // Based on an event on the controller, increment or decrement elevator position and execute command to set it.
-            if (gamepad2.a)
-            {
+            if (gamepad2.a) {
                 SmartServo1.setPosition(Range.clip(0.0, 0, 1));
             }
 
 
             // Based on an event on the controller, increment or decrement elevator position and execute command to set it.
-            if (gamepad2.b)
-            {
+            if (gamepad2.b) {
                 SmartServo1.setPosition(Range.clip(1.0, 0, 1));
             }
 
             // Based on an event on the controller, increment or decrement elevator position and execute command to set it.
-            if (gamepad2.left_bumper)
-            {
+            if (gamepad2.left_bumper) {
                 RunFlyWheel();
-            }
-            else
-            {
+            } else {
                 StopFlyWheel();
             }
 
