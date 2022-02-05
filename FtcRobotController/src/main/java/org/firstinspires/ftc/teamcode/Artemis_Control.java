@@ -189,6 +189,12 @@ public class Artemis_Control extends LinearOpMode {
             leftRear.setPower(LR);
             rightRear.setPower(RR);
 
+            // *************************************************************************
+            // GamePad 2 is the Gamepad that controls Claw, Boom, and Carousel.
+            // *************************************************************************
+
+
+
         } // OpModeIsActive End
     } // RunOpMode End
 // Wheels End
