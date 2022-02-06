@@ -305,6 +305,7 @@ public class Wheels2021 extends LinearOpMode { // Wheels Start
             leftRear.setPower(LR);
             rightRear.setPower(RR);
 
+            /*
             // *************************************************************************
             // GamePad 2 is the driver gamepad to control elevator, boom, and claw
             // *************************************************************************
@@ -339,6 +340,7 @@ public class Wheels2021 extends LinearOpMode { // Wheels Start
                 StopFlyWheel();
             }
 
+*/
 
         } // OpModeIsActive End
     } // RunOpMode End
