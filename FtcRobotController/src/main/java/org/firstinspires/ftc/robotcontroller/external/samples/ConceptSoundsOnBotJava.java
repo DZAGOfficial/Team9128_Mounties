@@ -33,6 +33,7 @@ import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
 import java.io.File;
 
 /**
@@ -59,14 +60,14 @@ import java.io.File;
  *      https://github.com/ftctechnh/ftc_app/tree/master/FtcRobotController/src/main/res/raw/silver.wav
  */
 
-@TeleOp(name="Concept: Sound Files", group="Concept")
+@TeleOp(name = "Concept: Sound Files", group = "Concept")
 @Disabled
 public class ConceptSoundsOnBotJava extends LinearOpMode {
 
     // Point to sound files on the phone's drive
-    private String soundPath = "/FIRST/blocks/sounds";
-    private File goldFile   = new File("/sdcard" + soundPath + "/gold.wav");
-    private File silverFile = new File("/sdcard" + soundPath + "/silver.wav");
+    private final String soundPath = "/FIRST/blocks/sounds";
+    private final File goldFile = new File("/sdcard" + soundPath + "/gold.wav");
+    private final File silverFile = new File("/sdcard" + soundPath + "/silver.wav");
 
     // Declare OpMode members.
     private boolean isX = false;    // Gamepad button state variables
