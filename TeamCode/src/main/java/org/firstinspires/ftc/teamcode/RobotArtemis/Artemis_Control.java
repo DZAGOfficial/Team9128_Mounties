@@ -24,7 +24,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 import java.util.concurrent.TimeUnit;
 
@@ -55,8 +54,24 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
     DcMotor rightRear = null;
     Servo SmartServo1;
     DcMotor FlyWheel;
-    DcMotor IntakeMotor;
+    // Smart Servo Settings
+    //double LEVERUP = -.25;
+    //double LEVERDOWN = .25;
+    //double LEVEROFF = .5;
+    //   Constants
+    //double MAX_CLAW_POSITION = .75;
+    //double MIN_CLAW_POSITION = .25;
+    //double MAX_ELEVATOR_POSITION = 1;
+    //double MIN_ELEVATOR_POSITION = .65;
+    // int MAX_BOOM_POSITION = 1000;
+    //int MIN_BOOM_POSITION = 0;
+    //int BOOM_FORWARD_JUMP = 500;       // positional increment going forward
+    //int BOOM_REVERSE_JUMP = 500;      // positional increment going in reverse
+    /* Declare OpMode members. */
+    private final ElapsedTime runtime = new ElapsedTime();
     DcMotor BeltMotor;
+    DcMotor carouselMotor;
+
     // declare motor speed variables
     double RF;                         // motor speed right front
     double LF;                         // motor speed left front
@@ -72,27 +87,15 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
     double clawPosition;              // current position of Claw
     double elevatorPosition;          // current position of Elevator
     int boomPosition;              // current position of Boom
-    // Smart Servo Settings
-    double LEVERUP = -.25;
-    double LEVERDOWN = .25;
-    double LEVEROFF = .5;
-    //   Constants
-    double MAX_CLAW_POSITION = .75;
-    double MIN_CLAW_POSITION = .25;
-    double MAX_ELEVATOR_POSITION = 1;
-    double MIN_ELEVATOR_POSITION = .65;
-    int MAX_BOOM_POSITION = 1000;
-    int MIN_BOOM_POSITION = 0;
-    int BOOM_FORWARD_JUMP = 500;       // positional increment going forward
-    int BOOM_REVERSE_JUMP = 500;      // positional increment going in reverse
-    /* Declare OpMode members. */
-    private final ElapsedTime runtime = new ElapsedTime();
+    DcMotor boomMotor;
 
     public void SetWheelDirection() {
         leftFront.setDirection(DcMotor.Direction.FORWARD);
         rightFront.setDirection(DcMotor.Direction.FORWARD);
         leftRear.setDirection(DcMotor.Direction.FORWARD);
         rightRear.setDirection(DcMotor.Direction.FORWARD);
+        boomMotor.setDirection(DcMotor.Direction.FORWARD);
+
     }
 
     public void UseEncoder() {
@@ -105,6 +108,7 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
         rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        boomMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     // Call the sleep timer to cause the program to wait for a certain number of seconds.
@@ -142,67 +146,23 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
         rightRear.setPower(0.0);
     }
 
-    public void SetFlyWheelDirection() {
-        FlyWheel.setDirection(DcMotor.Direction.FORWARD);
+    // This code is for the carousel.
+    public void SetcarouselMotorDirection() {
+        carouselMotor.setDirection(DcMotor.Direction.REVERSE);
     }
 
-    public void StopFlyWheel() {
-        FlyWheel.setPower(0.0);
-    }
-
-// Sets the direction of the wheels to move the bot left
-
-    public void RunFlyWheel() {
-        FlyWheel.setPower(0.75);
-    }
-
-
-    public void SetIntakeMotorDirection() {
-        IntakeMotor.setDirection(DcMotor.Direction.REVERSE);
-    }
-
-    public void StopIntakeMotor() {
-        IntakeMotor.setPower(0.0);
+    public void StopcarouselMotor() {
+        carouselMotor.setPower(0.0);
     }
 
 // Sets the direction of the wheels to move the bot left
 
-    public void RunIntakeMotor() {
-        IntakeMotor.setPower(0.5);
-    }
-
-// Sets the direction of the wheels to move the bot left
-
-    public void RunBeltMotor() {
-        BeltMotor.setPower(0.5);
-    }
-
-    public void SetBeltMotorDirection() {
-        BeltMotor.setDirection(DcMotor.Direction.FORWARD);
-    }
-
-    public void StopBeltMotor() {
-        BeltMotor.setPower(0.0);
-    }
-
-
-    public void RunFlyWheelBySeconds(double secs) {
-
-        runtime.reset();
-        SetFlyWheelDirection();
-        telemetry.addData("Moving forward seconds:.", "%.2f", secs);
-        telemetry.update();
-
-        while (runtime.seconds() <= secs) {
-            RunFlyWheel();
-        }
-
-        StopWheels();
+    public void RuncarouselMotor() {
+        carouselMotor.setPower(0.5);
     }
 
     @Override
-    public void runOpMode() {  // RunOpMode Start
-
+    public void runOpMode() { //RunOpMode Start
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
@@ -215,7 +175,7 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
         leftRear = hardwareMap.dcMotor.get("leftRear");
         rightRear = hardwareMap.dcMotor.get("rightRear");
         FlyWheel = hardwareMap.get(DcMotor.class, "FlyWheel");
-        IntakeMotor = hardwareMap.get(DcMotor.class, "Brad");
+        carouselMotor = hardwareMap.get(DcMotor.class, "Brad");
         BeltMotor = hardwareMap.get(DcMotor.class, "Belt");
         SmartServo1 = hardwareMap.get(Servo.class, "SmartServo1");
 
@@ -226,7 +186,7 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
         rightFront.setDirection(DcMotor.Direction.FORWARD);
         leftRear.setDirection(DcMotor.Direction.REVERSE);
         rightRear.setDirection(DcMotor.Direction.FORWARD);
-        //      BoomMotor.setDirection(DcMotor.Direction.FORWARD);
+        carouselMotor.setDirection(DcMotor.Direction.FORWARD);
 
         // Set the drive motor run modes:
         // "RUN_USING_ENCODER" causes the motor to try to run at the specified fraction of full velocity
@@ -236,15 +196,16 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
         rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        carouselMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
 
         // Set the initial settings for starting positions of the servo and motor
-        clawPosition = MIN_CLAW_POSITION;            // set Claw to closed
-        elevatorPosition = MIN_ELEVATOR_POSITION;    // set Elevator to full open
-        boomPosition = MIN_BOOM_POSITION;            // set Boom to all the way in
+        //  clawPosition = MIN_CLAW_POSITION;            // set Claw to closed
+        //  elevatorPosition = MIN_ELEVATOR_POSITION;    // set Elevator to full open
+        //  boomPosition = MIN_BOOM_POSITION;            // set Boom to all the way in
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) { // OpModeIsActive Start
@@ -298,6 +259,7 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
             RF = Math.max(-motorMax, Math.min(RF, motorMax));
             LR = Math.max(-motorMax, Math.min(LR, motorMax));
             RR = Math.max(-motorMax, Math.min(RR, motorMax));
+            //carouselMotor = Math.max(-motorMax, Math.min(RR, motorMax));
 
             // Send values to the motors
             leftFront.setPower(LF);
@@ -305,7 +267,7 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
             leftRear.setPower(LR);
             rightRear.setPower(RR);
 
-            /*
+
             // *************************************************************************
             // GamePad 2 is the driver gamepad to control elevator, boom, and claw
             // *************************************************************************
@@ -313,15 +275,12 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
 
             // Based on an event on the controller, increment or decrement elevator position and execute command to set it.
             if (gamepad2.x) {
-                SetIntakeMotorDirection();
-                RunIntakeMotor();
-                SetBeltMotorDirection();
-                RunBeltMotor();
+                SetcarouselMotorDirection();
+                RuncarouselMotor();
             } else {
-                StopIntakeMotor();
-                StopBeltMotor();
+                StopcarouselMotor();
             }
-
+/*
             // Based on an event on the controller, increment or decrement elevator position and execute command to set it.
             if (gamepad2.a) {
                 SmartServo1.setPosition(Range.clip(0.0, 0, 1));
@@ -339,8 +298,8 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
             } else {
                 StopFlyWheel();
             }
-
 */
+
 
         } // OpModeIsActive End
     } // RunOpMode End

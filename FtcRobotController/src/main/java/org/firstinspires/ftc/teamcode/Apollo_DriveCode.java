@@ -62,9 +62,9 @@ public class Apollo_DriveCode extends LinearOpMode {
     double joyScale = 2.0;             // joyscale constrant / USED TO SHOW HOW MUCH POWER IS GIVEN THROUGH AN INPUT
     double motorMax = 4.0;             // Limit motor power to this value for Andymark RUN_USING_ENCODER mode
     /* Declare OpMode members. */
-    private final ElapsedTime runtime = new ElapsedTime();
     private Blinker the_Hub;
     private Gyroscope imu;
+    private final ElapsedTime runtime = new ElapsedTime();
 
     public void SetWheelDirection() {
         leftRear.setDirection(DcMotor.Direction.FORWARD);
