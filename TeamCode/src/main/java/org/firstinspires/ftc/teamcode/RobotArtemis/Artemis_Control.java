@@ -16,7 +16,7 @@ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FO
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-package org.firstinspires.ftc.RobotArtemis;
+package org.firstinspires.ftc.teamcode.RobotArtemis;
 // Code based on http://team9960.org/mecanum-drive-prototype-1-manual-drive-software/
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -47,7 +47,7 @@ import java.util.concurrent.TimeUnit;
 @TeleOp(name = "Manual2021", group = "Linear Opmode")
 // @Disabled
 
-public class Wheels2021 extends LinearOpMode { // Wheels Start
+public class Artemis_Control extends LinearOpMode { // Wheels Start
 
     DcMotor leftFront = null;
     DcMotor rightFront = null;
