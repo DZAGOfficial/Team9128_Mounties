@@ -44,7 +44,7 @@ import java.util.concurrent.TimeUnit;
 
 // Opmode is manual
 
-@TeleOp(name = "Manual2021", group = "Linear Opmode")
+@TeleOp (name = "Artemis_Control", group = "Linear Opmode")
 // @Disabled
 
 public class Artemis_Control extends LinearOpMode { // Wheels Start
