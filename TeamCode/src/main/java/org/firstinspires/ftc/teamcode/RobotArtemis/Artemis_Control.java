@@ -52,8 +52,10 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
     DcMotor rightFront = null;
     DcMotor leftRear = null;
     DcMotor rightRear = null;
-    Servo SmartServo1;
-    DcMotor FlyWheel;
+    DcMotor BeltMotor;
+    DcMotor carouselMotor;
+  //  Servo SmartServo1;
+ //   DcMotor FlyWheel;
     // Smart Servo Settings
     //double LEVERUP = -.25;
     //double LEVERDOWN = .25;
@@ -69,8 +71,7 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
     //int BOOM_REVERSE_JUMP = 500;      // positional increment going in reverse
     /* Declare OpMode members. */
     private final ElapsedTime runtime = new ElapsedTime();
-    DcMotor BeltMotor;
-    DcMotor carouselMotor;
+
 
     // declare motor speed variables
     double RF;                         // motor speed right front
@@ -174,10 +175,10 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
         rightFront = hardwareMap.dcMotor.get("rightFront");
         leftRear = hardwareMap.dcMotor.get("leftRear");
         rightRear = hardwareMap.dcMotor.get("rightRear");
-        FlyWheel = hardwareMap.get(DcMotor.class, "FlyWheel");
+        //FlyWheel = hardwareMap.get(DcMotor.class, "FlyWheel");
         carouselMotor = hardwareMap.get(DcMotor.class, "Brad");
         BeltMotor = hardwareMap.get(DcMotor.class, "Belt");
-        SmartServo1 = hardwareMap.get(Servo.class, "SmartServo1");
+        //SmartServo1 = hardwareMap.get(Servo.class, "SmartServo1");
 
         // Set the drive motor direction:
         // "Reverse" the motor that runs backwards when connected directly to the battery
