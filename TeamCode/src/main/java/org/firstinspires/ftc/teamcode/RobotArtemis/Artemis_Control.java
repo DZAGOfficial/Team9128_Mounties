@@ -54,6 +54,8 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
     DcMotor rightRear = null;
     Servo SmartServo1;
     DcMotor FlyWheel;
+
+
     // Smart Servo Settings
     //double LEVERUP = -.25;
     //double LEVERDOWN = .25;
