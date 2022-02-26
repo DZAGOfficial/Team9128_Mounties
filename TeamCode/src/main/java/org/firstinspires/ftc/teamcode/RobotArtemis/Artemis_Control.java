@@ -317,8 +317,6 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
             } else {
                 stopboomMotor();
             }
-
-
             if (gamepad2.y) {
                 SetboomMotorDirection();
                 reverseboomMotor();
