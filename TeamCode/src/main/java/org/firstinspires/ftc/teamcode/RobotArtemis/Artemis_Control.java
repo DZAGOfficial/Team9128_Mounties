@@ -26,7 +26,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-
 import java.util.concurrent.TimeUnit;
 
 // This program provides 2 gamepad control for the robot
@@ -45,12 +44,16 @@ import java.util.concurrent.TimeUnit;
 
 // Opmode is manual
 
-@TeleOp (name = "Artemis_Control", group = "Linear Opmode")
+@TeleOp(name = "Artemis_Control", group = "Linear Opmode")
 // @Disabled
 
 public class Artemis_Control extends LinearOpMode { // Wheels Start
 
 
+    // int BOOM_FORWARD_JUMP = 500;       // positional increment going forward
+    // int BOOM_REVERSE_JUMP = 500;      // positional increment going in reverse
+    /* Declare OpMode members. */
+    private final ElapsedTime runtime = new ElapsedTime();
     // Declaring our opMode members
     DcMotor leftFront = null;
     DcMotor rightFront = null;
@@ -58,28 +61,24 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
     DcMotor rightRear = null;
     DcMotor carouselMotor = null;
     DcMotor boomMotor = null;
-    Servo   ClawServo = null;
-    Servo   ElevatorServo = null;
-  //  Servo SmartServo1;
- //   DcMotor FlyWheel;
+    Servo ClawServo = null;
+    Servo ElevatorServo = null;
+    //  Servo SmartServo1;
+    //   DcMotor FlyWheel;
     // Smart Servo Settings
     //double LEVERUP = -.25;
     //double LEVERDOWN = .25;
     //double LEVEROFF = .5;
-
+    Servo armServo = null;
     //   Constants
     double MAX_CLAW_POSITION = .75;
     double MIN_CLAW_POSITION = .25;
     double MAX_ELEVATOR_POSITION = 1;
     double MIN_ELEVATOR_POSITION = .65;
+    double MIN_ARM_POSITION = .50;
+    double MAX_ARM_POSITION = 1;
     int MAX_BOOM_POSITION = 1000;
     int MIN_BOOM_POSITION = 0;
-   // int BOOM_FORWARD_JUMP = 500;       // positional increment going forward
-   // int BOOM_REVERSE_JUMP = 500;      // positional increment going in reverse
-    /* Declare OpMode members. */
-    private final ElapsedTime runtime = new ElapsedTime();
-
-
     // declare motor speed variables
     double RF;                         // motor speed right front
     double LF;                         // motor speed left front
@@ -94,6 +93,7 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
     double SERVO_JUMP = 0.1;           // positional increment for servo movement
     double clawPosition;              // current position of Claw
     double elevatorPosition;          // current position of Elevator
+    double armPosition; // current position of Arm
     int boomPosition;              // current position of Boom
 
 
@@ -102,7 +102,7 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
         rightFront.setDirection(DcMotor.Direction.FORWARD);
         leftRear.setDirection(DcMotor.Direction.FORWARD);
         rightRear.setDirection(DcMotor.Direction.FORWARD);
-  //      boomMotor.setDirection(DcMotor.Direction.FORWARD);
+        //      boomMotor.setDirection(DcMotor.Direction.FORWARD);
 
     }
 
@@ -173,23 +173,26 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
     // This code is for the boom Motor.
 
     public void SetboomMotorDirection() {
-         boomMotor.setDirection(DcMotor.Direction.FORWARD);
+        boomMotor.setDirection(DcMotor.Direction.FORWARD);
     }
-// Sets boom motor to run.
+
+    // Sets boom motor to run.
     public void forwardboomMotor() {
         boomMotor.setPower(0.5);
     }
+
     // Sets boom motor to run.
     public void reverseboomMotor() {
         boomMotor.setPower(-0.5);
     }
+
     // stops the motor
     public void stopboomMotor() {
         boomMotor.setPower(0.0);
     }
 
     //@Override
-    public void runOpMode () { //RunOpMode Start
+    public void runOpMode() { //RunOpMode Start
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
@@ -231,8 +234,9 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
         runtime.reset();
 
         // Set the initial settings for starting positions of the servo and motor
-          clawPosition = MIN_CLAW_POSITION;            // set Claw to closed
-          elevatorPosition = MIN_ELEVATOR_POSITION;    // set Elevator to full open
+        clawPosition = MIN_CLAW_POSITION;            // set Claw to closed
+        elevatorPosition = MIN_ELEVATOR_POSITION;    // set Elevator to full open
+        armPosition = MIN_ARM_POSITION; // set THE ARM to lowest position
 
 
         // run until the end of the match (driver presses STOP)
@@ -324,34 +328,42 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
                 stopboomMotor();
             }
 
-        // Based on an event on the controller, increment or decrement claw position.
-        if (gamepad2.left_bumper && clawPosition < MAX_CLAW_POSITION)
-        {
-            clawPosition += SERVO_JUMP;
-            telemetry.addData("LeftClaw", "%.3f", clawPosition);
-            ClawServo.setPosition(Range.clip(clawPosition, MIN_CLAW_POSITION, MAX_CLAW_POSITION));
-        }
+            // Based on an event on the controller, increment or decrement claw position.
+            if (gamepad2.left_bumper && clawPosition < MAX_CLAW_POSITION) {
+                clawPosition += SERVO_JUMP;
+                telemetry.addData("LeftClaw", "%.3f", clawPosition);
+                ClawServo.setPosition(Range.clip(clawPosition, MIN_CLAW_POSITION, MAX_CLAW_POSITION));
+            }
 
-        if (gamepad2.right_bumper && clawPosition > MIN_CLAW_POSITION)
-        {
-            clawPosition -= SERVO_JUMP;
-            telemetry.addData("RightClaw", "%.3f", clawPosition);
-            ClawServo.setPosition(Range.clip(clawPosition, MIN_CLAW_POSITION, MAX_CLAW_POSITION));
-        }
+            if (gamepad2.right_bumper && clawPosition > MIN_CLAW_POSITION) {
+                clawPosition -= SERVO_JUMP;
+                telemetry.addData("RightClaw", "%.3f", clawPosition);
+                ClawServo.setPosition(Range.clip(clawPosition, MIN_CLAW_POSITION, MAX_CLAW_POSITION));
+            }
 
-        // Based on an event on the controller, increment or decrement elevator position and execute command to set it.
-        if (gamepad2.dpad_down && elevatorPosition < MAX_ELEVATOR_POSITION)
-        {
-            elevatorPosition += SERVO_JUMP;
-            ElevatorServo.setPosition(Range.clip(elevatorPosition, MIN_ELEVATOR_POSITION, MAX_ELEVATOR_POSITION));
-        }
+            if (gamepad2.right_trigger > 0 && armPosition < MAX_ARM_POSITION) {
+                armPosition += SERVO_JUMP;
+                telemetry.addData("Arm", "%.3f", armPosition);
+                armServo.setPosition(Range.clip(armPosition, MIN_ARM_POSITION, MAX_ARM_POSITION));
+            }
 
-        if (gamepad2.dpad_up && elevatorPosition > MIN_ELEVATOR_POSITION)
-        {
-            elevatorPosition -= SERVO_JUMP;
-            telemetry.addData("RightElev", "%.3f", elevatorPosition);
-            ElevatorServo.setPosition(Range.clip(elevatorPosition, MIN_ELEVATOR_POSITION, MAX_ELEVATOR_POSITION));
-        }
-    } // OpModeIsActive End
+            if (gamepad2.left_trigger > 0 && armPosition > MIN_ARM_POSITION) {
+                armPosition -= SERVO_JUMP;
+                telemetry.addData("Arm", "%.3f", armPosition);
+                armServo.setPosition(Range.clip(armPosition, MIN_ARM_POSITION, MAX_ARM_POSITION));
+            }
+
+            // Based on an event on the controller, increment or decrement elevator position and execute  command to set it.
+            if (gamepad2.dpad_down && elevatorPosition < MAX_ELEVATOR_POSITION) {
+                elevatorPosition += SERVO_JUMP;
+                ElevatorServo.setPosition(Range.clip(elevatorPosition, MIN_ELEVATOR_POSITION, MAX_ELEVATOR_POSITION));
+            }
+
+            if (gamepad2.dpad_up && elevatorPosition > MIN_ELEVATOR_POSITION) {
+                elevatorPosition -= SERVO_JUMP;
+                telemetry.addData("RightElev", "%.3f", elevatorPosition);
+                ElevatorServo.setPosition(Range.clip(elevatorPosition, MIN_ELEVATOR_POSITION, MAX_ELEVATOR_POSITION));
+            }
+        } // OpModeIsActive End
     } // RunOpMode End
 } // Wheels End
