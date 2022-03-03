@@ -19,20 +19,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 package org.firstinspires.ftc.teamcode.RobotArtemis;
 // Code based on http://team9960.org/mecanum-drive-prototype-1-manual-drive-software/
 
+import java.util.concurrent.TimeUnit;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
-import java.util.concurrent.TimeUnit;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import org.firstinspires.ftc.robotcore.external.Event;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.HardwareMap;
+
 
 // This program provides 2 gamepad control for the robot
 // GAMEPAD1 Controls the wheels
@@ -86,25 +80,25 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
     double Event_Wheel_Right_Y;          // joystick position right y
     double Event_Wheel_Left_X;           // joystick position left x
     double Event_Wheel_Left_Y;           // joystick position left y
-    double joyScale = 2.0;               // joyscale constrant / USED TO SHOW HOW MUCH POWER IS GIVEN THROUGH AN INPUT
-    double motorMax = 4.0;               // Limit motor power to this value for Andymark RUN_USING_ENCODER mode
-    final double CLAW_SPEED = 0.01;      // positional increment for servo movement
-    final double ARM_SPEED = 0.001;      // positional increment for servo movement
-    final double ELEVATOR_SPEED = 0.01;  // positional increment for servo movement
+    double joyScale = 1.5;               // joyscale constrant / USED TO SHOW HOW MUCH POWER IS GIVEN THROUGH AN INPUT
+    double motorMax = 2.0;               // Limit motor power to this value for Andymark RUN_USING_ENCODER mode
+    final double CLAW_SPEED = 0.025;      // positional increment for servo movement
+    final double ARM_SPEED = 0.5;      // positional increment for servo movement
+    final double ELEVATOR_SPEED = 0.5;  // positional increment for servo movement
 
     double clawPosition = CLAW_HOME;               // current position of Claw
     double elevatorPosition = ELEVATOR_HOME;       // current position of Elevator
     double armPosition = ARM_HOME;                 // current position of Arm
 
     //   Constants
-    public final static double MAX_CLAW_POSITION = 0.7;
-    public final static double MIN_CLAW_POSITION = 0.2;
-    public final static double CLAW_HOME = 0.2;
-    public final static double MAX_ELEVATOR_POSITION = 0.7;
+    public final static double MAX_CLAW_POSITION = 1.0;
+    public final static double MIN_CLAW_POSITION = 0;
+    public final static double CLAW_HOME = 0.5;
+    public final static double MAX_ELEVATOR_POSITION = 0.8;
     public final static double MIN_ELEVATOR_POSITION = 0.2;
-    public final static double ELEVATOR_HOME = 0.2;
-    public final static double MIN_ARM_POSITION = 0.5;
-    public final static double MAX_ARM_POSITION = 0.7;
+    public final static double ELEVATOR_HOME = 0.5;
+    public final static double MIN_ARM_POSITION = 0.25;
+    public final static double MAX_ARM_POSITION = 0.8;
     public final static double ARM_HOME = 0.5;
 
 
@@ -178,7 +172,7 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
 
 // Sets carousel motor to run.
     public void RuncarouselMotor() {
-        carouselMotor.setPower(0.5);
+        carouselMotor.setPower(1.0);
     }
 
 
@@ -194,12 +188,12 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
 
     // Sets boom motor to run.
     public void forwardboomMotor() {
-        boomMotor.setPower(0.8);
+        boomMotor.setPower(1.0);
     }
 
     // Sets boom motor to run.
     public void reverseboomMotor() {
-        boomMotor.setPower(-0.8);
+        boomMotor.setPower(-1.0);
     }
 
     private final ElapsedTime runtime = new ElapsedTime();
@@ -346,9 +340,9 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
             // *************************************
 
             // this code will control the claw.
-            if (gamepad2.left_bumper) { // IF BUTTON PRESSED, CODE BELOW RUNS
+            if (gamepad2.left_bumper && clawPosition < MAX_CLAW_POSITION) { // IF BUTTON PRESSED, CODE BELOW RUNS
             clawPosition += CLAW_SPEED; // ADDS TO THE SERVO POSITION SO IT MOVES
-        } else if (gamepad2.right_bumper) { //IF BUTTON PRESSED, THE CODE BELOW RUNS
+        } else if (gamepad2.right_bumper && clawPosition > MIN_CLAW_POSITION) { //IF BUTTON PRESSED, THE CODE BELOW RUNS
             clawPosition -= CLAW_SPEED; // SUBTRACTS TO THE SERVO POSITION SO IT MOVES
         }
         // move boths servos to the new position
@@ -357,9 +351,9 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
            // *************************************
 
            // This code is for the Arm Servo
-            if (gamepad2.left_trigger >= 0.5) { // IF BUTTON PRESSED, CODE BELOW RUNS
+            if (gamepad2.left_trigger >= 0.5/* && armPosition < MAX_ARM_POSITION*/) { // IF BUTTON PRESSED, CODE BELOW RUNS
                 armPosition += ARM_SPEED; // ADDS TO THE SERVO POSITION SO IT MOVES
-            } else if (gamepad2.right_trigger >= 0.5) { //IF BUTTON PRESSED, THE CODE BELOW RUNS
+            } else if (gamepad2.right_trigger >= 0.5 /*&& armPosition > MIN_ARM_POSITION*/) { //IF BUTTON PRESSED, THE CODE BELOW RUNS
                 armPosition -= ARM_SPEED; // SUBTRACTS TO THE SERVO POSITION SO IT MOVES
             }
             // move boths servos to the new position
@@ -367,10 +361,10 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
             armServo.setPosition(armPosition); // This code will set the position of the servo
             // *************************************
 
-            // This code is for the elevatpr Servo
-            if (gamepad2.dpad_up) { // IF BUTTON PRESSED, CODE BELOW RUNS
+            // This code is for the elevator Servo
+            if (gamepad2.dpad_up && elevatorPosition < MAX_ELEVATOR_POSITION) { // IF BUTTON PRESSED, CODE BELOW RUNS
                 elevatorPosition += ELEVATOR_SPEED; // ADDS TO THE SERVO POSITION SO IT MOVES
-            } else if (gamepad2.dpad_down) { //IF BUTTON PRESSED, THE CODE BELOW RUNS
+            } else if (gamepad2.dpad_down && elevatorPosition > MIN_ELEVATOR_POSITION) { //IF BUTTON PRESSED, THE CODE BELOW RUNS
                 elevatorPosition -= ELEVATOR_SPEED; // SUBTRACTS TO THE SERVO POSITION SO IT MOVES
             }
             // move boths servos to the new position
