@@ -83,7 +83,7 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
     double joyScale = 1.5;               // joyscale constrant / USED TO SHOW HOW MUCH POWER IS GIVEN THROUGH AN INPUT
     double motorMax = 2.0;               // Limit motor power to this value for Andymark RUN_USING_ENCODER mode
     final double CLAW_SPEED = 0.025;      // positional increment for servo movement
-    final double ARM_SPEED = 0.5;      // positional increment for servo movement
+    final double ARM_SPEED = 0.050;      // positional increment for servo movement
     final double ELEVATOR_SPEED = 0.5;  // positional increment for servo movement
 
     double clawPosition = CLAW_HOME;               // current position of Claw
@@ -92,13 +92,13 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
 
     //   Constants
     public final static double MAX_CLAW_POSITION = 1.0;
-    public final static double MIN_CLAW_POSITION = 0;
-    public final static double CLAW_HOME = 0.5;
+    public final static double MIN_CLAW_POSITION = 0.5;
+    public final static double CLAW_HOME = 0.8;
     public final static double MAX_ELEVATOR_POSITION = 0.8;
-    public final static double MIN_ELEVATOR_POSITION = 0.2;
+    public final static double MIN_ELEVATOR_POSITION = 0.15;
     public final static double ELEVATOR_HOME = 0.5;
-    public final static double MIN_ARM_POSITION = 0.25;
-    public final static double MAX_ARM_POSITION = 0.8;
+    public final static double MIN_ARM_POSITION = 0.2;
+    public final static double MAX_ARM_POSITION = 0.7;
     public final static double ARM_HOME = 0.5;
 
 
