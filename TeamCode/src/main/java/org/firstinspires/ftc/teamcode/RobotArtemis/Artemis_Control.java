@@ -24,6 +24,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -61,9 +62,9 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
     DcMotor rightRear = null;
     DcMotor carouselMotor = null;
     DcMotor boomMotor = null;
-    public Servo   ClawServo = null;
-    public Servo   ElevatorServo = null;
-    public Servo   armServo = null;
+    public CRServo   ClawServo = null;
+    public CRServo   ElevatorServo = null;
+    public CRServo   armServo = null;
 
     // Smart Servo Settings
     //double LEVERUP = -.25;
@@ -98,7 +99,7 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
     public final static double MIN_ELEVATOR_POSITION = 0.15;
     public final static double ELEVATOR_HOME = 0.5;
     public final static double MIN_ARM_POSITION = 0.2;
-    public final static double MAX_ARM_POSITION = 0.7;
+    public final static double MAX_ARM_POSITION = 0.6;
     public final static double ARM_HOME = 0.5;
 
 
@@ -211,11 +212,11 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
         rightFront = hardwareMap.dcMotor.get("rightFront");
         leftRear = hardwareMap.dcMotor.get("leftRear");
         rightRear = hardwareMap.dcMotor.get("rightRear");
-        ClawServo = hardwareMap.servo.get("clawServo");
-        ElevatorServo = hardwareMap.servo.get("elevatorServo");
+        ClawServo = hardwareMap.crservo.get("clawServo");
+        ElevatorServo = hardwareMap.crservo.get("elevatorServo");
         carouselMotor = hardwareMap.get(DcMotor.class, "Brad");
         boomMotor = hardwareMap.get(DcMotor.class, "boomMotor");
-        armServo = hardwareMap.servo.get("armServo");
+        armServo = hardwareMap.crservo.get("armServo");
 
 
         // Set the drive motor direction:
@@ -244,9 +245,9 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
         runtime.reset();
 
         // Set the initial settings for starting positions of the servo and motor
-        ClawServo.setPosition(CLAW_HOME);
-        ElevatorServo.setPosition(ELEVATOR_HOME);
-        armServo.setPosition(ARM_HOME);
+     //   ClawServo.setPosition(CLAW_HOME);
+      //  ElevatorServo.setPosition(ELEVATOR_HOME);
+      //  armServo.setPosition(ARM_HOME);
 
 
         //boomPosition = MIN_BOOM_POSITION;            // set Boom to all the way in
@@ -341,13 +342,13 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
 
             // this code will control the claw.
             if (gamepad2.left_bumper && clawPosition < MAX_CLAW_POSITION) { // IF BUTTON PRESSED, CODE BELOW RUNS
-            clawPosition += CLAW_SPEED; // ADDS TO THE SERVO POSITION SO IT MOVES
+                clawPosition += CLAW_SPEED; // ADDS TO THE SERVO POSITION SO IT MOVES
         } else if (gamepad2.right_bumper && clawPosition > MIN_CLAW_POSITION) { //IF BUTTON PRESSED, THE CODE BELOW RUNS
             clawPosition -= CLAW_SPEED; // SUBTRACTS TO THE SERVO POSITION SO IT MOVES
         }
         // move boths servos to the new position
             clawPosition = Range.clip(clawPosition, MIN_CLAW_POSITION, MAX_CLAW_POSITION); // MAKES SURE THE POSITION IS VALID
-            ClawServo.setPosition(clawPosition); // This code will set the position of the servo
+          //  ClawServo.setPosition(clawPosition); // This code will set the position of the servo
            // *************************************
 
            // This code is for the Arm Servo
@@ -358,7 +359,7 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
             }
             // move boths servos to the new position
             armPosition = Range.clip(armPosition, MIN_ARM_POSITION, MAX_ARM_POSITION); // MAKES SURE THE POSITION IS VALID
-            armServo.setPosition(armPosition); // This code will set the position of the servo
+          //  armServo.setPosition(armPosition); // This code will set the position of the servo
             // *************************************
 
             // This code is for the elevator Servo
@@ -369,7 +370,7 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
             }
             // move boths servos to the new position
             elevatorPosition = Range.clip(elevatorPosition, MIN_ELEVATOR_POSITION, MAX_ELEVATOR_POSITION); // MAKES SURE THE POSITION IS VALID
-            ElevatorServo.setPosition(elevatorPosition); // This code will set the position of the servo
+         //   ElevatorServo.setPosition(elevatorPosition); // This code will set the position of the servo
 
 
 
