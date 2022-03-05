@@ -22,9 +22,10 @@ package org.firstinspires.ftc.teamcode.RobotArtemis;
 import java.util.concurrent.TimeUnit;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.CRServo;
+
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -62,9 +63,9 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
     DcMotor rightRear = null;
     DcMotor carouselMotor = null;
     DcMotor boomMotor = null;
-    public CRServo   ClawServo = null;
-    public CRServo   ElevatorServo = null;
-    public CRServo   armServo = null;
+    public Servo ClawServo = null;
+    public Servo   ElevatorServo = null;
+    public Servo   armServo = null;
 
     // Smart Servo Settings
     //double LEVERUP = -.25;
@@ -82,9 +83,9 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
     double Event_Wheel_Left_X;           // joystick position left x
     double Event_Wheel_Left_Y;           // joystick position left y
     double joyScale = 1.5;               // joyscale constrant / USED TO SHOW HOW MUCH POWER IS GIVEN THROUGH AN INPUT
-    double motorMax = 2.0;               // Limit motor power to this value for Andymark RUN_USING_ENCODER mode
+    double motorMax = 0.3;               // Limit motor power to this value for Andymark RUN_USING_ENCODER mode
     final double CLAW_SPEED = 0.025;      // positional increment for servo movement
-    final double ARM_SPEED = 0.050;      // positional increment for servo movement
+    final double ARM_SPEED = 0.05;      // positional increment for servo movement
     final double ELEVATOR_SPEED = 0.5;  // positional increment for servo movement
 
     double clawPosition = CLAW_HOME;               // current position of Claw
@@ -96,10 +97,10 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
     public final static double MIN_CLAW_POSITION = 0.5;
     public final static double CLAW_HOME = 0.8;
     public final static double MAX_ELEVATOR_POSITION = 0.8;
-    public final static double MIN_ELEVATOR_POSITION = 0.15;
+    public final static double MIN_ELEVATOR_POSITION = 0.2;
     public final static double ELEVATOR_HOME = 0.5;
-    public final static double MIN_ARM_POSITION = 0.2;
-    public final static double MAX_ARM_POSITION = 0.6;
+    public final static double MIN_ARM_POSITION = 0.25;
+    public final static double MAX_ARM_POSITION = 0.70;
     public final static double ARM_HOME = 0.5;
 
 
@@ -173,7 +174,7 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
 
 // Sets carousel motor to run.
     public void RuncarouselMotor() {
-        carouselMotor.setPower(1.0);
+        carouselMotor.setPower(2.0);
     }
 
 
@@ -189,12 +190,12 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
 
     // Sets boom motor to run.
     public void forwardboomMotor() {
-        boomMotor.setPower(1.0);
+        boomMotor.setPower(2.0);
     }
 
     // Sets boom motor to run.
     public void reverseboomMotor() {
-        boomMotor.setPower(-1.0);
+        boomMotor.setPower(-2.0);
     }
 
     private final ElapsedTime runtime = new ElapsedTime();
@@ -212,11 +213,11 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
         rightFront = hardwareMap.dcMotor.get("rightFront");
         leftRear = hardwareMap.dcMotor.get("leftRear");
         rightRear = hardwareMap.dcMotor.get("rightRear");
-        ClawServo = hardwareMap.crservo.get("clawServo");
-        ElevatorServo = hardwareMap.crservo.get("elevatorServo");
+        ClawServo = hardwareMap.servo.get("clawServo");
+        ElevatorServo = hardwareMap.servo.get("elevatorServo");
         carouselMotor = hardwareMap.get(DcMotor.class, "Brad");
         boomMotor = hardwareMap.get(DcMotor.class, "boomMotor");
-        armServo = hardwareMap.crservo.get("armServo");
+        armServo = hardwareMap.servo.get("armServo");
 
 
         // Set the drive motor direction:
@@ -348,7 +349,7 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
         }
         // move boths servos to the new position
             clawPosition = Range.clip(clawPosition, MIN_CLAW_POSITION, MAX_CLAW_POSITION); // MAKES SURE THE POSITION IS VALID
-          //  ClawServo.setPosition(clawPosition); // This code will set the position of the servo
+            ClawServo.setPosition(clawPosition); // This code will set the position of the servo
            // *************************************
 
            // This code is for the Arm Servo
@@ -359,7 +360,7 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
             }
             // move boths servos to the new position
             armPosition = Range.clip(armPosition, MIN_ARM_POSITION, MAX_ARM_POSITION); // MAKES SURE THE POSITION IS VALID
-          //  armServo.setPosition(armPosition); // This code will set the position of the servo
+            armServo.setPosition(armPosition); // This code will set the position of the servo
             // *************************************
 
             // This code is for the elevator Servo
@@ -370,7 +371,7 @@ public class Artemis_Control extends LinearOpMode { // Wheels Start
             }
             // move boths servos to the new position
             elevatorPosition = Range.clip(elevatorPosition, MIN_ELEVATOR_POSITION, MAX_ELEVATOR_POSITION); // MAKES SURE THE POSITION IS VALID
-         //   ElevatorServo.setPosition(elevatorPosition); // This code will set the position of the servo
+            ElevatorServo.setPosition(elevatorPosition); // This code will set the position of the servo
 
 
 
